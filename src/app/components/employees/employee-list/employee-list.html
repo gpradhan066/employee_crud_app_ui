@@ -1,0 +1,107 @@
+<nav class="top-nav">
+  <span>Employee Management</span>
+</nav>
+
+<section class="employee-page">
+  <div class="page-header">
+    <div>
+      <h1>Employees</h1>
+      <p>{{ employeeCount() }} employees in the system</p>
+    </div>
+
+    <button type="button" class="secondary-button" (click)="loadEmployees()" [disabled]="isLoading()">
+      Refresh
+    </button>
+  </div>
+
+  <div class="content-grid">
+    <form class="employee-form" [formGroup]="employeeForm" (ngSubmit)="saveEmployee()">
+      <h2>{{ formTitle() }}</h2>
+
+      <label>
+        Name
+        <input type="text" formControlName="name" placeholder="Enter employee name">
+      </label>
+      @if (employeeForm.controls.name.touched && employeeForm.controls.name.invalid) {
+        <p class="field-error">Name must contain at least 2 characters.</p>
+      }
+
+      <label>
+        Department
+        <input type="text" formControlName="department" placeholder="Enter department">
+      </label>
+      @if (employeeForm.controls.department.touched && employeeForm.controls.department.invalid) {
+        <p class="field-error">Department must contain at least 2 characters.</p>
+      }
+
+      <button type="submit" class="primary-button" [disabled]="isSaving()">
+        {{ submitLabel() }}
+      </button>
+
+      @if (editingEmployeeId()) {
+        <button type="button" class="secondary-button full-width" (click)="resetForm()" [disabled]="isSaving()">
+          Cancel Edit
+        </button>
+      }
+    </form>
+
+    <section class="employee-list">
+      <div class="list-header">
+        <h2>Employee List</h2>
+        @if (isLoading()) {
+          <span>Loading...</span>
+        }
+      </div>
+
+      @if (successMessage()) {
+        <p class="success-message">{{ successMessage() }}</p>
+      }
+
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (employee of employees(); track employee.id) {
+              <tr>
+                <td>{{ employee.id }}</td>
+                <td>{{ employee.name }}</td>
+                <td>{{ employee.department }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button type="button" class="table-button edit-button" (click)="editEmployee(employee)">
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="table-button delete-button"
+                      (click)="deleteEmployee(employee)"
+                      [disabled]="isDeleting() === employee.id"
+                    >
+                      {{ isDeleting() === employee.id ? 'Deleting...' : 'Delete' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-state">No employees found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>
